@@ -1,25 +1,20 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
+import ChartContainer from './Chart/ChartContainer/ChartContainer';
+import { getPlanetsForChart, findVehicleByHigestPilotsHomePlanePopulation } from './api';
 import './App.css';
 
-function App() {
+export default function App() {
+  const [planets, setPlanets] = useState([]);
+  useEffect(() => {
+    (async () => {
+      await findVehicleByHigestPilotsHomePlanePopulation();
+      setPlanets(await getPlanetsForChart());
+    })();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <ChartContainer planets={planets} />
     </div>
   );
 }
-
-export default App;

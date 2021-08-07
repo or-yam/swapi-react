@@ -1,0 +1,22 @@
+.chartBarWrapper {
+  width: 90px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.bar {
+  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  background-color: green;
+}
+
+.numberLabel {
+  text-align: center;
+}
+
+.nameLabel {
+  text-align: center;
+}
