@@ -1,0 +1,51 @@
+.chartBarWrapper {
+  position: relative;
+  width: 90px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.bar {
+  width: 8px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0px 0px 10px, 0px 0px 2px inset;
+  animation: glow 1.5s linear infinite;
+}
+
+.numberLabel {
+  text-align: center;
+}
+
+.nameLabel {
+  text-align: center;
+  margin-top: 100px;
+  font-size: 1.3rem;
+}
+
+@keyframes glow {
+  from {
+    color: var(--second-bar-color);
+    box-shadow: 0 0 9px var(--main-bar-color);
+  }
+  50% {
+    color: var(--second-bar-color);
+    box-shadow: 0 0 18px var(--main-bar-color);
+  }
+  to {
+    color: var(--second-bar-color);
+    box-shadow: 0 0 9px var(--main-bar-color);
+  }
+}
+
+.hilt {
+  position: absolute;
+  bottom: 40px;
+  width: 60px;
+  height: 120px;
+}

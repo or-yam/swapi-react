@@ -1,0 +1,68 @@
+import { getVehicles, getPilotsByVehicles, getPlanetsByPilots } from '../services/api';
+import { saveResultsToLocalStorage, getResultsFromLocalStorage } from '../services/localStorage';
+
+const mapData = async (vehicles, pilots, planets) =>
+  vehicles.map(vehicle => ({
+    name: vehicle.name,
+    pilots: vehicle.pilots.map(pilotUrl => {
+      const pilot = pilots.find(p => p.url === pilotUrl);
+      pilot.homePlanet = planets.find(planet => planet.url === pilot.homeworld);
+      return pilot;
+    })
+  }));
+
+const printResults = results => {
+  results &&
+    console.table({
+      'Vehicle name with the largest sum': results.topVehicle.name,
+      'Related home planets and their respective population': results.planets,
+      'Related pilot names': results.pilots
+    });
+};
+
+const getVehicleByHighestPilotPlanePopulation = async () => {
+  const results = {
+    topVehicle: { sum: 0 },
+    planets: [],
+    pilots: []
+  };
+  const vehicles = await getVehicles();
+  const pilots = await getPilotsByVehicles(vehicles);
+  const planets = await getPlanetsByPilots(pilots);
+  const mappedData = await mapData(vehicles, pilots, planets);
+
+  mappedData.forEach(vehicle => {
+    let sum = 0;
+    const tempPilots = [];
+
+    vehicle.pilots.forEach(pilot => {
+      tempPilots.push(pilot);
+      if (pilot.homePlanet.population !== 'unknown') {
+        sum += Number(pilot.homePlanet.population);
+      }
+    });
+
+    if (sum > results.topVehicle.sum) {
+      results.topVehicle = { sum, name: vehicle.name };
+      results.pilots = tempPilots.map(({ name }) => name);
+      results.planets = tempPilots.map(({ homePlanet }) => ({
+        name: homePlanet.name,
+        number: homePlanet.population
+      }));
+    }
+  });
+
+  printResults(results);
+  saveResultsToLocalStorage(results, 'results');
+};
+
+const getPopulationResults = () => {
+  const results = getResultsFromLocalStorage('results');
+  if (results) {
+    printResults(results);
+    return;
+  }
+  getVehicleByHighestPilotPlanePopulation();
+};
+
+export default getPopulationResults;

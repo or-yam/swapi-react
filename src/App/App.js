@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
-import ChartContainer from './Chart/ChartContainer/ChartContainer';
-import { getPlanetsForChart, findVehicleByHigestPilotsHomePlanePopulation } from './api';
+import ChartContainer from '../components/ChartContainer/ChartContainer';
+import getPlanetsData from './planets';
+import getPopulationResults from './vehiclePopulation';
 import './App.css';
 
 export default function App() {
   const [planets, setPlanets] = useState([]);
+
   useEffect(() => {
+    getPopulationResults();
     (async () => {
-      await findVehicleByHigestPilotsHomePlanePopulation();
-      setPlanets(await getPlanetsForChart());
+      const planetsData = await getPlanetsData();
+      setPlanets(planetsData);
     })();
   }, []);
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import ChartColumn from '../ChartColumn/ChartColumn';
 import styles from './ChartContainer.module.css';
 
