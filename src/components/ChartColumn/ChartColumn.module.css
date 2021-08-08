@@ -9,13 +9,15 @@
 }
 
 .bar {
+  height: 0;
   width: 8px;
   margin-top: 5px;
   margin-bottom: 5px;
   background-color: #fff;
   border-radius: 6px;
   box-shadow: 0px 0px 10px, 0px 0px 2px inset;
-  animation: glow 1.5s linear infinite;
+  transform-origin: 50% 100%;
+  animation: glow 1.5s linear infinite, grow 300ms linear;
 }
 
 .numberLabel {
@@ -26,6 +28,13 @@
   text-align: center;
   margin-top: 100px;
   font-size: 1.3rem;
+}
+
+.hilt {
+  position: absolute;
+  bottom: 40px;
+  width: 60px;
+  height: 120px;
 }
 
 @keyframes glow {
@@ -43,9 +52,11 @@
   }
 }
 
-.hilt {
-  position: absolute;
-  bottom: 40px;
-  width: 60px;
-  height: 120px;
+@keyframes grow {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
 }
