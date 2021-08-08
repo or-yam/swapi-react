@@ -17,9 +17,11 @@ const printResults = results => {
   results &&
     console.table({
       'Vehicle name with the largest sum': results.topVehicle.name,
-      'Related home planets and their respective population': results.planets,
-      'Related pilot names': results.pilots
+      'Related home planets and their respective population':
+        results.planets.length === 1 ? results.planets[0] : results.planets,
+      'Related pilots names': results.pilots
     });
+  console.log({ 'Related home planets': results.planets });
 };
 
 const getVehicleByHighestPilotPlanePopulation = async () => {
