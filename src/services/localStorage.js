@@ -6,6 +6,7 @@ export const saveResultsToLocalStorage = (results, key) => {
 
 export const getResultsFromLocalStorage = key => {
   const results = localStorage.getItem(`${STORAGE_NAME}_${key}`);
+  if (!results) return;
   console.log(`${key} restored from local storage`);
-  return results ? JSON.parse(results) : false;
+  return JSON.parse(results);
 };

@@ -1,6 +1,8 @@
 import { getVehicles, getPilotsByVehicles, getPlanetsByPilots } from '../services/api';
 import { saveResultsToLocalStorage, getResultsFromLocalStorage } from '../services/localStorage';
 
+const LOCAL_STORAGE_KEY = 'results';
+
 const mapData = async (vehicles, pilots, planets) =>
   vehicles.map(vehicle => ({
     name: vehicle.name,
@@ -53,11 +55,11 @@ const getVehicleByHighestPilotPlanePopulation = async () => {
   });
 
   printResults(results);
-  saveResultsToLocalStorage(results, 'results');
+  saveResultsToLocalStorage(results, LOCAL_STORAGE_KEY);
 };
 
 const getPopulationResults = () => {
-  const results = getResultsFromLocalStorage('results');
+  const results = getResultsFromLocalStorage(LOCAL_STORAGE_KEY);
   if (results) {
     printResults(results);
     return;

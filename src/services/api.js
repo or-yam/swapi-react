@@ -1,12 +1,3 @@
-// couldn't find a way to get all vehicles without pagination
-// Assume to be a constant results number of 39 in 4 pages
-// Assuming the data remain the same
-
-// Alternative APIs
-// https://www.swapi.tech/api
-// https://swapi.py4e.com/api/
-// https://swapi.dev/api/
-
 import axios from 'axios';
 
 const API_BASE_URL = 'https://swapi.py4e.com/api/';
@@ -19,7 +10,8 @@ export const getVehicles = async () => {
   const pagesUrls = new Array(NUMBER_OF_RESULTS_PAGES).fill().map((_, index) => `vehicles/?page=${index + 1}`);
   try {
     (await Promise.all(pagesUrls.map(pageUrl => fetchData(`${API_BASE_URL}${pageUrl}`)))).forEach(page => {
-      Array.prototype.push.apply(vehicles, page.results); // pushing all objects from the page to the vehicles array
+      // pushing all objects from the page to the vehicles array
+      Array.prototype.push.apply(vehicles, page.results);
     });
   } catch (error) {
     console.log(error);
