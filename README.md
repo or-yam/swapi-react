@@ -1,10 +1,13 @@
 # SWAPI with create-react-app
 
-The api doesn't expose an endpoint to get all vehicles without pagination.
+## Running the app locally
 
-Since there is no upcoming Star-wars movie, I assumed that the number of
+1. clone the repo
+2. run `npm i`
+3. run `npm start`
+4. open `http://localhost:3000/` in your browser
 
-results will stay constant: 39 vehicles in 4 pages.
+The api doesn't expose an endpoint to get all vehicles without pagination and since there is no upcoming Star-wars movie, I assumed that the number of results will stay constant: 39 vehicles in 4 pages.
 
 After the first fetch the data will be stored in local-storage.
 
