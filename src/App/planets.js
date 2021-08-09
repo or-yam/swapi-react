@@ -9,9 +9,14 @@ const getPlanetsData = async () => {
   if (localStoragePlanets) {
     return localStoragePlanets;
   }
-  const planets = await getPlanetsByNames(PLANETS_LIST);
-  saveResultsToLocalStorage(planets, LOCAL_STORAGE_KEY);
-  return planets;
+
+  try {
+    const planets = await getPlanetsByNames(PLANETS_LIST);
+    saveResultsToLocalStorage(planets, LOCAL_STORAGE_KEY);
+    return planets;
+  } catch (error) {
+    return false;
+  }
 };
 
 export default getPlanetsData;

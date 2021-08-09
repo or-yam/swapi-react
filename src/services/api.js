@@ -8,14 +8,11 @@ const fetchData = async (endpoint = '') => (await axios.get(endpoint)).data;
 export const getVehicles = async () => {
   const vehicles = [];
   const pagesUrls = new Array(NUMBER_OF_RESULTS_PAGES).fill().map((_, index) => `vehicles/?page=${index + 1}`);
-  try {
-    (await Promise.all(pagesUrls.map(pageUrl => fetchData(`${API_BASE_URL}${pageUrl}`)))).forEach(page => {
-      // pushing all objects from the page to the vehicles array
-      Array.prototype.push.apply(vehicles, page.results);
-    });
-  } catch (error) {
-    console.log(error);
-  }
+
+  (await Promise.all(pagesUrls.map(pageUrl => fetchData(`${API_BASE_URL}${pageUrl}`)))).forEach(page => {
+    // pushing all objects from the page to the vehicles array
+    Array.prototype.push.apply(vehicles, page.results);
+  });
 
   const vehiclesWithPilots = vehicles.filter(vehicle => vehicle.pilots.length > 0);
   return vehiclesWithPilots;
@@ -31,12 +28,9 @@ export const getPilotsByVehicles = async vehicles => {
       }
     });
   });
-  try {
-    const pilots = await Promise.all(pilotsUrls.map(url => fetchData(url)));
-    return pilots;
-  } catch (error) {
-    console.log(error);
-  }
+
+  const pilots = await Promise.all(pilotsUrls.map(url => fetchData(url)));
+  return pilots;
 };
 
 export const getPlanetsByPilots = async pilots => {
@@ -47,24 +41,18 @@ export const getPlanetsByPilots = async pilots => {
       planetsUrls.push(pilot.homeworld);
     }
   });
-  try {
-    const planets = await Promise.all(planetsUrls.map(url => fetchData(url)));
-    return planets;
-  } catch (error) {
-    console.log(error);
-  }
+
+  const planets = await Promise.all(planetsUrls.map(url => fetchData(url)));
+  return planets;
 };
 
 export const getPlanetsByNames = async list => {
   const urls = list.map(name => `${API_BASE_URL}planets/?search=${name}`);
-  try {
-    const planets = (await Promise.all(urls.map(url => fetchData(url)))).map(({ results }) => {
-      const { name, population } = results[0];
-      return { name, population };
-    });
 
-    return planets;
-  } catch (error) {
-    console.log(error);
-  }
+  const planets = (await Promise.all(urls.map(url => fetchData(url)))).map(({ results }) => {
+    const { name, population } = results[0];
+    return { name, population };
+  });
+
+  return planets;
 };

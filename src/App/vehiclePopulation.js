@@ -24,16 +24,31 @@ const printResults = results => {
   console.log({ 'Related home planets': results.planets });
 };
 
+const fetchAndMap = async () => {
+  try {
+    const vehicles = await getVehicles();
+    const pilots = await getPilotsByVehicles(vehicles);
+    const planets = await getPlanetsByPilots(pilots);
+    const mappedData = await mapData(vehicles, pilots, planets);
+    return mappedData;
+  } catch (error) {
+    console.warn(error);
+    return error;
+  }
+};
+
 const getVehicleByHighestPilotPlanePopulation = async () => {
   const results = {
     topVehicle: { sum: 0 },
     planets: [],
     pilots: []
   };
-  const vehicles = await getVehicles();
-  const pilots = await getPilotsByVehicles(vehicles);
-  const planets = await getPlanetsByPilots(pilots);
-  const mappedData = await mapData(vehicles, pilots, planets);
+
+  const mappedData = await fetchAndMap();
+  if (mappedData instanceof Error) {
+    console.log(mappedData.message);
+    return;
+  }
 
   mappedData.forEach(vehicle => {
     let sum = 0;
