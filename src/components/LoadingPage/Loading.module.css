@@ -7,6 +7,7 @@
   align-items: center;
 }
 
+/* Animation from https://loading.io/css/ */
 .ldsHourglass {
   display: inline-block;
   position: relative;
@@ -20,6 +21,7 @@
   width: 0;
   height: 0;
   margin: 8px;
+  background-color: var(--main-bar-color);
   box-sizing: border-box;
   border: 32px solid #fff;
   border-color: #fff transparent #fff transparent;

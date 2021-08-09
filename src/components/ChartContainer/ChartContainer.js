@@ -2,6 +2,7 @@ import ChartColumn from '../ChartColumn/ChartColumn';
 import styles from './ChartContainer.module.css';
 
 export default function ChartContainer({ planets }) {
+  // use log to normalized data scale
   const maxHeight = Math.max(...planets.map(({ population }) => Math.log(population)));
   const toPercentage = value => (Math.log(value) / maxHeight) * 100;
 

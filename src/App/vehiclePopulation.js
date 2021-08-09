@@ -18,6 +18,7 @@ const printResults = results => {
     console.table({
       'Vehicle name with the largest sum': results.topVehicle.name,
       'Related home planets and their respective population':
+      // to make the planet data visible in the table 
         results.planets.length === 1 ? results.planets[0] : results.planets,
       'Related pilots names': results.pilots
     });

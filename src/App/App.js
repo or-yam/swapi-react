@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import ChartContainer from '../components/ChartContainer/ChartContainer';
-import Error from '../components/ErrorPage/ErrorPage';
+import ErrorPage from '../components/ErrorPage/ErrorPage';
 import Loading from '../components/LoadingPage/Loading';
 import getPlanetsData from './planets';
 import getPopulationResults from './vehiclePopulation';
@@ -14,7 +14,7 @@ export default function App() {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      await getPopulationResults();
+      getPopulationResults();
       const planetsData = await getPlanetsData();
       planetsData ? setPlanets(planetsData) : setIsError(true);
       setIsLoading(false);
@@ -22,7 +22,7 @@ export default function App() {
   }, []);
 
   if (isLoading) return <Loading />;
-  if (isError) return <Error />;
+  if (isError) return <ErrorPage />;
 
   return (
     <div className="App">
