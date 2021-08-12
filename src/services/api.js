@@ -1,20 +1,43 @@
 import axios from 'axios';
 
 const API_BASE_URL = 'https://swapi.py4e.com/api/';
-const NUMBER_OF_RESULTS_PAGES = 4;
 
 const fetchData = async (endpoint = '') => (await axios.get(endpoint)).data;
 
+// Old way of fetching data  performance measure-> 1649.67
+// export const getVehicles = async () => {
+//   window.performance.mark('vehicles_start');
+//   const vehicles = [];
+//   const pagesUrls = new Array(NUMBER_OF_RESULTS_PAGES).fill().map((_, index) => `vehicles/?page=${index + 1}`);
+
+//   (await Promise.all(pagesUrls.map(pageUrl => fetchData(`${API_BASE_URL}${pageUrl}`)))).forEach(page => {
+//     // pushing all objects from the page to the vehicles array
+//     Array.prototype.push.apply(vehicles, page.results);
+//   });
+
+//   const vehiclesWithPilots = vehicles.filter(vehicle => vehicle.pilots.length > 0);
+//   window.performance.mark('vehicles_end');
+//   window.performance.measure('vehicles_duration', 'vehicles_start', 'vehicles_end');
+//   console.log(window.performance.getEntriesByName('vehicles_duration')[0].duration);
+//   return vehiclesWithPilots;
+// };
+
+// new way of fetching data performance measure->  635.12
+const getDataRecursively = async (page = 1, results = []) => {
+  const data = await fetchData(`${API_BASE_URL}vehicles/?page=${page}`);
+  if (data.next) {
+    results.push(...data.results);
+    return await getDataRecursively(page + 1, results);
+  }
+  return results;
+};
+
 export const getVehicles = async () => {
-  const vehicles = [];
-  const pagesUrls = new Array(NUMBER_OF_RESULTS_PAGES).fill().map((_, index) => `vehicles/?page=${index + 1}`);
-
-  (await Promise.all(pagesUrls.map(pageUrl => fetchData(`${API_BASE_URL}${pageUrl}`)))).forEach(page => {
-    // pushing all objects from the page to the vehicles array
-    Array.prototype.push.apply(vehicles, page.results);
-  });
-
-  const vehiclesWithPilots = vehicles.filter(vehicle => vehicle.pilots.length > 0);
+  // window.performance.mark('vehicles_start');
+  const vehiclesWithPilots = await getDataRecursively();
+  // window.performance.mark('vehicles_end');
+  // window.performance.measure('vehicles_duration', 'vehicles_start', 'vehicles_end');
+  // console.log(window.performance.getEntriesByName('vehicles_duration')[0].duration);
   return vehiclesWithPilots;
 };
 
