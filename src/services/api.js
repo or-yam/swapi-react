@@ -41,18 +41,39 @@ export const getVehicles = async () => {
   return vehiclesWithPilots;
 };
 
-export const getPilotsByVehicles = async vehicles => {
-  const pilotsUrls = [];
-  vehicles.forEach(vehicle => {
-    vehicle.pilots.forEach(pilotUrl => {
-      const isPilotExist = pilotsUrls.find(url => url === pilotUrl);
-      if (!isPilotExist) {
-        pilotsUrls.push(pilotUrl);
-      }
-    });
-  });
+// Old way of fetching pilots performance measure-> 430.7
+// export const getPilotsByVehicles = async vehicles => {
+//   window.performance.mark('pilots_start');
 
-  const pilots = await Promise.all(pilotsUrls.map(url => fetchData(url)));
+//   const pilotsUrls = [];
+//   vehicles.forEach(vehicle => {
+//     vehicle.pilots.forEach(pilotUrl => {
+//       const isPilotExist = pilotsUrls.find(url => url === pilotUrl);
+//       if (!isPilotExist) {
+//         pilotsUrls.push(pilotUrl);
+//       }
+//     });
+//   });
+
+//   const pilots = await Promise.all(pilotsUrls.map(url => fetchData(url)));
+//   window.performance.mark('pilots_end');
+//   window.performance.measure('pilots_duration', 'pilots_start', 'pilots_end');
+//   console.log(window.performance.getEntriesByName('pilots_duration')[0].duration);
+//   return pilots;
+// };
+
+// new way of fetching pilots performance measure->  101.12
+export const getPilotsByVehicles = async vehicles => {
+  // window.performance.mark('pilots_start');
+  const pilotsUrls = [];
+  vehicles.forEach(({ pilots }) => {
+    pilotsUrls.push(...pilots);
+  });
+  const unique = [...new Set(pilotsUrls)];
+  const pilots = await Promise.all(unique.map(url => fetchData(url)));
+  // window.performance.mark('pilots_end');
+  // window.performance.measure('pilots_duration', 'pilots_start', 'pilots_end');
+  // console.log(window.performance.getEntriesByName('pilots_duration')[0].duration);
   return pilots;
 };
 
