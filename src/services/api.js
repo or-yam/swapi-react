@@ -2,79 +2,42 @@ import axios from 'axios';
 
 const API_BASE_URL = 'https://swapi.py4e.com/api/';
 
-const fetchData = async (endpoint = '') => (await axios.get(endpoint)).data;
+axios.defaults.baseURL = API_BASE_URL;
 
-// Old way of fetching data  performance measure-> 1649.67
-// export const getVehicles = async () => {
-//   window.performance.mark('vehicles_start');
-//   const vehicles = [];
-//   const pagesUrls = new Array(NUMBER_OF_RESULTS_PAGES).fill().map((_, index) => `vehicles/?page=${index + 1}`);
+const fetchData = async endpoint => (await axios.get(endpoint)).data;
 
-//   (await Promise.all(pagesUrls.map(pageUrl => fetchData(`${API_BASE_URL}${pageUrl}`)))).forEach(page => {
-//     // pushing all objects from the page to the vehicles array
-//     Array.prototype.push.apply(vehicles, page.results);
-//   });
-
-//   const vehiclesWithPilots = vehicles.filter(vehicle => vehicle.pilots.length > 0);
-//   window.performance.mark('vehicles_end');
-//   window.performance.measure('vehicles_duration', 'vehicles_start', 'vehicles_end');
-//   console.log(window.performance.getEntriesByName('vehicles_duration')[0].duration);
-//   return vehiclesWithPilots;
-// };
-
-// new way of fetching data performance measure->  635.12
-const getDataRecursively = async (page = 1, results = []) => {
-  const data = await fetchData(`${API_BASE_URL}vehicles/?page=${page}`);
+const getDataRecursively = async (endPoint, page, results) => {
+  const data = await fetchData(`${endPoint}?page=${page}`);
   if (data.next) {
     results.push(...data.results);
-    return await getDataRecursively(page + 1, results);
+    return getDataRecursively(endPoint, page + 1, results);
   }
   return results;
 };
 
 export const getVehicles = async () => {
-  // window.performance.mark('vehicles_start');
-  const vehiclesWithPilots = await getDataRecursively();
-  // window.performance.mark('vehicles_end');
-  // window.performance.measure('vehicles_duration', 'vehicles_start', 'vehicles_end');
-  // console.log(window.performance.getEntriesByName('vehicles_duration')[0].duration);
-  return vehiclesWithPilots;
+  try {
+    const vehiclesWithPilots = await getDataRecursively('vehicles/', 1, []);
+    return vehiclesWithPilots;
+  } catch (error) {
+    console.log('Could not fetch vehicles ', error);
+    return [];
+  }
 };
 
-// Old way of fetching pilots performance measure-> 430.7
-// export const getPilotsByVehicles = async vehicles => {
-//   window.performance.mark('pilots_start');
-
-//   const pilotsUrls = [];
-//   vehicles.forEach(vehicle => {
-//     vehicle.pilots.forEach(pilotUrl => {
-//       const isPilotExist = pilotsUrls.find(url => url === pilotUrl);
-//       if (!isPilotExist) {
-//         pilotsUrls.push(pilotUrl);
-//       }
-//     });
-//   });
-
-//   const pilots = await Promise.all(pilotsUrls.map(url => fetchData(url)));
-//   window.performance.mark('pilots_end');
-//   window.performance.measure('pilots_duration', 'pilots_start', 'pilots_end');
-//   console.log(window.performance.getEntriesByName('pilots_duration')[0].duration);
-//   return pilots;
-// };
-
-// new way of fetching pilots performance measure->  101.12
 export const getPilotsByVehicles = async vehicles => {
-  // window.performance.mark('pilots_start');
   const pilotsUrls = [];
   vehicles.forEach(({ pilots }) => {
     pilotsUrls.push(...pilots);
   });
   const unique = [...new Set(pilotsUrls)];
-  const pilots = await Promise.all(unique.map(url => fetchData(url)));
-  // window.performance.mark('pilots_end');
-  // window.performance.measure('pilots_duration', 'pilots_start', 'pilots_end');
-  // console.log(window.performance.getEntriesByName('pilots_duration')[0].duration);
-  return pilots;
+  try {
+    const pilots = await Promise.all(unique.map(url => fetchData(url)));
+    return pilots;
+  } catch (error) {
+    console.log('Could not fetch pilots ', error);
+    return [];
+  }
 };
 
 export const getPlanetsByPilots = async pilots => {
@@ -86,17 +49,27 @@ export const getPlanetsByPilots = async pilots => {
     }
   });
 
-  const planets = await Promise.all(planetsUrls.map(url => fetchData(url)));
-  return planets;
+  try {
+    const planets = await Promise.all(planetsUrls.map(url => fetchData(url)));
+    return planets;
+  } catch (error) {
+    console.log('Could not fetch planets ', error);
+    return [];
+  }
 };
 
 export const getPlanetsByNames = async list => {
-  const urls = list.map(name => `${API_BASE_URL}planets/?search=${name}`);
+  const urls = list.map(name => `planets/?search=${name}`);
 
-  const planets = (await Promise.all(urls.map(url => fetchData(url)))).map(({ results }) => {
-    const { name, population } = results[0];
-    return { name, population };
-  });
-
-  return planets;
+  try {
+    const planets = await Promise.all(urls.map(url => fetchData(url)));
+    const planetsMapped = planets.map(({ results }) => {
+      const { name, population } = results[0];
+      return { name, population };
+    });
+    return planetsMapped;
+  } catch (error) {
+    console.log('Could not fetch planets ', error);
+    return [];
+  }
 };

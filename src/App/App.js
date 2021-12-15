@@ -15,14 +15,14 @@ export default function App() {
     (async () => {
       setIsLoading(true);
       getPopulationResults();
-      const planetsData = await getPlanetsData();
+      const planetsData = await getPlanetsData(); // TODO catching and handling errors
       planetsData ? setPlanets(planetsData) : setIsError(true);
       setIsLoading(false);
     })();
   }, []);
 
   if (isLoading) return <Loading />;
-  if (isError) return <ErrorPage />;
+  if (isError) return <ErrorPage />; // Maybe use React.ErrorBoundaries
 
   return (
     <div className="App">

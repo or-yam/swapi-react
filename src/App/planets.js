@@ -4,6 +4,7 @@ import { saveResultsToLocalStorage, getResultsFromLocalStorage } from '../servic
 const PLANETS_LIST = ['Tatooine', 'Alderaan', 'Naboo', 'Bespin', 'Endor'];
 const LOCAL_STORAGE_KEY = 'planets';
 
+// Why is it here ? 
 const getPlanetsData = async () => {
   const localStoragePlanets = getResultsFromLocalStorage(LOCAL_STORAGE_KEY);
   if (localStoragePlanets) {

@@ -3,6 +3,7 @@ import { saveResultsToLocalStorage, getResultsFromLocalStorage } from '../servic
 
 const LOCAL_STORAGE_KEY = 'results';
 
+// Might be over complicated. 
 const mapData = async (vehicles, pilots, planets) =>
   vehicles.map(vehicle => ({
     name: vehicle.name,
