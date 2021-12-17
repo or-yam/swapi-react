@@ -13,20 +13,8 @@ const fetchAllPagesRecursively = async (dataName, page = 1, results = []) => {
   return results;
 };
 
-// const getBy = async (get, by) => {
-//   const urls = [];
-//   by.forEach(({ get }) => urls.push(...get));
-//   const uniqueUrls = [...new Set(urls)];
-//   try {
-//     const data = await Promise.all(uniqueUrls.map(url => fetchData(url)));
-//     return data;
-//   } catch (error) {
-//     console.warn(`Could not fetch ${get}`, error);
-//     return [];
-//   }
-// };
-
-export const getVehicles = async () => {
+const getVehicles = async () => {
+  console.info('Fetching all vehicles...');
   try {
     const vehicles = await fetchAllPagesRecursively('vehicles', 1, []);
     return vehicles;
@@ -36,7 +24,8 @@ export const getVehicles = async () => {
   }
 };
 
-export const getPilotsByVehicles = async vehicles => {
+const getPilotsByVehicles = async vehicles => {
+  console.info('Fetching relevant pilots...');
   const pilotsUrls = [];
   vehicles.forEach(({ pilots }) => pilotsUrls.push(...pilots));
   const uniqueUrls = [...new Set(pilotsUrls)];
@@ -49,19 +38,8 @@ export const getPilotsByVehicles = async vehicles => {
   }
 };
 
-export const getPilotsByVehicle = async vehicle => {
-  const pilotsUrls = vehicle.pilots;
-  const uniqueUrls = [...new Set(pilotsUrls)]; // might not be necessary
-  try {
-    const pilots = await Promise.all(uniqueUrls.map(url => fetchData(url)));
-    return pilots;
-  } catch (error) {
-    console.warn('Could not fetch pilots', error);
-    return [];
-  }
-};
-
-export const getPlanetsByPilots = async pilots => {
+const getPlanetsByPilots = async pilots => {
+  console.info('Fetching relevant planets...');
   const planetsUrls = [];
   pilots.forEach(({ homeworld }) => {
     planetsUrls.push(homeworld);
@@ -70,7 +48,7 @@ export const getPlanetsByPilots = async pilots => {
   try {
     const planets = await Promise.all(uniqueUrls.map(url => fetchData(url)));
     const planetsWithPopulation = planets.filter(({ population }) => population !== 'unknown');
-    return planetsWithPopulation.map(({ name, population }) => ({ name, population }));
+    return planetsWithPopulation;
   } catch (error) {
     console.warn('Could not fetch planets', error);
     return [];
@@ -91,30 +69,33 @@ export const getPlanetsByNames = async planetsNames => {
   }
 };
 
-export const findVehiclesWithHighestPopulation = async () => {
+export const findMostPopulatedVehicle = async () => {
+  console.info('Finding the most populated vehicle...');
   const results = {
     vehicle: { populationSum: 0 },
     planets: [],
     pilotsNames: []
   };
+
   const vehicles = await getVehicles();
-  // using promise all instead of forEach because of async nature of getPilotsByVehicle
-  // https://stackoverflow.com/a/51738717/13516210
-  await Promise.all(
-    vehicles.map(async vehicle => {
-      // might have duplication fetching data
-      const pilots = await getPilotsByVehicle(vehicle);
-      if (pilots.length === 0) return;
-      const planets = await getPlanetsByPilots(pilots);
-      if (planets.length === 0) return;
-      const population = planets.reduce((acc, { population }) => acc + Number(population), 0);
-      if (population > results.vehicle.populationSum) {
-        results.vehicle = { vehicleName: vehicle.name, populationSum: population };
-        results.planets = planets;
-        results.pilotsNames = pilots.map(({ name }) => name);
-      }
-    })
-  );
+  const pilots = await getPilotsByVehicles(vehicles);
+  const planets = await getPlanetsByPilots(pilots);
+
+  vehicles.forEach(vehicle => {
+    const vehiclePilots = pilots.filter(pilot => vehicle.pilots.includes(pilot.url));
+    if (!vehiclePilots.length) return;
+
+    const vehiclePlanets = planets.filter(planet => vehiclePilots.some(pilot => pilot.homeworld === planet.url));
+    if (!vehiclePlanets.length) return;
+
+    const vehiclePopulation = vehiclePlanets.reduce((acc, { population }) => acc + Number(population), 0);
+
+    if (vehiclePopulation > results.vehicle.populationSum) {
+      results.vehicle = { name: vehicle.name, populationSum: vehiclePopulation };
+      results.planets = vehiclePlanets;
+      results.pilotsNames = vehiclePilots.map(pilot => pilot.name);
+    }
+  });
 
   return results;
 };
