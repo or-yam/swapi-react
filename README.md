@@ -16,3 +16,6 @@ Just for fun, The bar-chart is displayed as light-sabers.
 - https://www.swapi.tech/api
 - https://swapi.py4e.com/api/ (current one)
 - https://swapi.dev/api/
+
+![image](https://user-images.githubusercontent.com/48219965/146653906-b54e5f20-b207-4364-b9e3-0b4825d74a00.png)
+
