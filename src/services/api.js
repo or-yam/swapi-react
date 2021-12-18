@@ -13,32 +13,33 @@ const fetchAllPagesRecursively = async (dataName, page = 1, results = []) => {
   return results;
 };
 
-const getVehicles = async () => {
+export const getVehicles = async () => {
   console.info('Fetching all vehicles...');
   try {
     const vehicles = await fetchAllPagesRecursively('vehicles', 1, []);
     return vehicles;
   } catch (error) {
     console.warn('Could not fetch vehicles', error);
-    return [];
+    return null;
   }
 };
 
-const getPilotsByVehicles = async vehicles => {
+export const getPilotsByVehicles = async vehicles => {
   console.info('Fetching relevant pilots...');
   const pilotsUrls = [];
   vehicles.forEach(({ pilots }) => pilotsUrls.push(...pilots));
   const uniqueUrls = [...new Set(pilotsUrls)];
   try {
+    // All or nothing
     const pilots = await Promise.all(uniqueUrls.map(url => fetchData(url)));
     return pilots;
   } catch (error) {
     console.warn('Could not fetch pilots', error);
-    return [];
+    return null;
   }
 };
 
-const getPlanetsByPilots = async pilots => {
+export const getPlanetsByPilots = async pilots => {
   console.info('Fetching relevant planets...');
   const planetsUrls = [];
   pilots.forEach(({ homeworld }) => {
@@ -46,56 +47,29 @@ const getPlanetsByPilots = async pilots => {
   });
   const uniqueUrls = [...new Set(planetsUrls)];
   try {
+    // All or nothing
     const planets = await Promise.all(uniqueUrls.map(url => fetchData(url)));
     const planetsWithPopulation = planets.filter(({ population }) => population !== 'unknown');
     return planetsWithPopulation;
   } catch (error) {
     console.warn('Could not fetch planets', error);
-    return [];
+    return null;
   }
 };
 
 export const getPlanetsByNames = async planetsNames => {
+  console.info('Fetching planets list...', planetsNames);
   const urls = planetsNames.map(name => `${API_BASE_URL}planets/?search=${name}`);
   try {
+    // All or nothing
     const planetsData = await Promise.all(urls.map(url => fetchData(url)));
     return planetsData.map(({ results }) => {
+      if (!results) return null;
       const { name, population } = results[0];
       return { name, population };
     });
   } catch (error) {
     console.warn('Could not fetch planets', error);
-    return [];
+    return null;
   }
-};
-
-export const findMostPopulatedVehicle = async () => {
-  console.info('Finding the most populated vehicle...');
-  const results = {
-    vehicle: { populationSum: 0 },
-    planets: [],
-    pilotsNames: []
-  };
-
-  const vehicles = await getVehicles();
-  const pilots = await getPilotsByVehicles(vehicles);
-  const planets = await getPlanetsByPilots(pilots);
-
-  vehicles.forEach(vehicle => {
-    const vehiclePilots = pilots.filter(pilot => vehicle.pilots.includes(pilot.url));
-    if (!vehiclePilots.length) return;
-
-    const vehiclePlanets = planets.filter(planet => vehiclePilots.some(pilot => pilot.homeworld === planet.url));
-    if (!vehiclePlanets.length) return;
-
-    const vehiclePopulation = vehiclePlanets.reduce((acc, { population }) => acc + Number(population), 0);
-
-    if (vehiclePopulation > results.vehicle.populationSum) {
-      results.vehicle = { name: vehicle.name, populationSum: vehiclePopulation };
-      results.planets = vehiclePlanets;
-      results.pilotsNames = vehiclePilots.map(pilot => pilot.name);
-    }
-  });
-
-  return results;
 };
